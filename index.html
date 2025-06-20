@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إنشاء حساب - محتواك</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+    body {
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .container {
+      background-color: #f9f9f9;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      text-align: center;
+      color: #d00;
+      margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; color: #333; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      color: #000;
+    }
+    .btn {
+      width: 100%;
+      background-color: #d00;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background-color: #b00; }
+    .welcome {
+      text-align: center;
+      margin-top: 15px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>إنشاء حساب في محتواك</h2>
+    <form id="signupForm">
+      <div class="form-group">
+        <label>الاسم</label>
+        <input type="text" id="name" required />
+      </div>
+      <div class="form-group">
+        <label>الإيميل</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" id="password" required />
+      </div>
+      <div class="form-group">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="phone" required />
+      </div>
+      <div class="form-group">
+        <label>السن</label>
+        <input type="number" id="age" required />
+      </div>
+      <div class="form-group">
+        <label>الخدمة</label>
+        <select id="service" required>
+          <option>مونتاج</option>
+          <option>إنشاء صور مصغرة</option>
+          <option>كتابة سكريبت</option>
+          <option>تحليل قناة</option>
+          <option>تعليق صوتي</option>
+          <option>تصميم غلاف/لوجو</option>
+          <option>أخرى...</option>
+        </select>
+      </div>
+      <button type="submit" class="btn">إنشاء الحساب</button>
+    </form>
+    <div class="welcome">
+      <p>مرحبًا بك في <strong>محتواك</strong>!</p>
+    </div>
+  </div>
+
+  <script>
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4YGIHObEz7gkr6z7At09n9p6cJMj9l2A",
+      authDomain: "hsa4-ac45e.firebaseapp.com",
+      projectId: "hsa4-ac45e",
+      storageBucket: "hsa4-ac45e.firebasestorage.app",
+      messagingSenderId: "688236241105",
+      appId: "1:688236241105:web:4b5ff00e3f25b931b9a5f0",
+      measurementId: "G-5P717K607F"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    document.getElementById("signupForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const phone = document.getElementById("phone").value;
+      const age = document.getElementById("age").value;
+      const service = document.getElementById("service").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          // تحديث اسم المستخدم
+          return user.updateProfile({
+            displayName: name
+          }).then(() => {
+            // تخزين باقي البيانات في Firestore
+            return db.collection("users").doc(user.uid).set({
+              uid: user.uid,
+              name: name,
+              email: email,
+              phone: phone,
+              age: age,
+              service: service,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          });
+        })
+        .then(() => {
+          alert("✅ تم إنشاء الحساب بنجاح!");
+          window.location.href = "dashboard.html"; // غيرها إذا أردت صفحة مختلفة
+        })
+        .catch((error) => {
+          alert("❌ " + error.message);
+        });
+    });
+  </script>
+
+</body>
+</html>

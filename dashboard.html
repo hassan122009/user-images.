@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة التحكم - محتواك</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      background-color: #d00;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 0 0 20px 20px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-name {
+      font-size: 16px;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid white;
+      background-color: white;
+    }
+
+    .profile-pic img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .content {
+      padding: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Header احترافي -->
+  <header style="background-color: #d00; color: white; padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; border-radius: 0 0 20px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: 'Cairo', sans-serif;">
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <div style="font-size: 24px; font-weight: bold;">📌 محتواك</div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <div id="userName" style="font-size: 16px;">مرحباً، ...</div>
+    
+    <div class="profile-pic" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid white; background-color: white;">
+      <img id="userImage" src="default-user.png" alt="الصورة" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+<a href="profile.html" style="background: white; color: #d00; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+  الملف الشخصي
+</a>
+
+    <button onclick="logout()" style="background: white; color: #d00; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+      تسجيل الخروج
+    </button>
+  </div>
+</header>
+
+
+  <div class="content">
+    <h2>مرحباً بك في لوحة التحكم!</h2>
+    <p>هنا يمكنك إدارة حسابك وخدماتك.</p>
+  </div>
+
+  <script>
+    // دالة تسجيل الخروج
+function logout() {
+  auth.signOut().then(() => {
+    window.location.href = "login.html"; // توجيه بعد تسجيل الخروج
+  }).catch(error => {
+    alert("❌ حدث خطأ أثناء تسجيل الخروج: " + error.message);
+  });
+}
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4YGIHObEz7gkr6z7At09n9p6cJMj9l2A",
+      authDomain: "hsa4-ac45e.firebaseapp.com",
+      projectId: "hsa4-ac45e",
+      storageBucket: "hsa4-ac45e.firebasestorage.app",
+      messagingSenderId: "688236241105",
+      appId: "1:688236241105:web:4b5ff00e3f25b931b9a5f0",
+      measurementId: "G-5P717K607F"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // عرض بيانات المستخدم
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const name = user.displayName || user.email.split('@')[0]; // لو مفيش اسم، خد الجزء من الإيميل
+        document.getElementById("userName").innerHTML = `مرحباً، <strong>${name}</strong>`;
+
+        if (user.photoURL) {
+          document.getElementById("userImage").src = user.photoURL;
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الملف الشخصي - محتواك</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <style>
+    * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    header {
+      background-color: #d00;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .profile-container {
+      max-width: 500px;
+      margin: 30px auto;
+      background-color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      margin: auto;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #d00;
+      margin-bottom: 10px;
+    }
+
+    .profile-pic img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      background-color: #d00;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #b00;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>📌 محتواك</div>
+    <button onclick="logout()" style="background: white; color: #d00; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer;">
+      تسجيل الخروج
+    </button>
+  </header>
+
+  <div class="profile-container">
+    <div class="profile-pic">
+      <img id="profileImage" src="default-user.png" alt="صورة المستخدم">
+    </div>
+    <input type="file" id="newImage" accept="image/*">
+
+    <label>الاسم</label>
+    <input type="text" id="name" required>
+
+    <label>الإيميل (لا يمكن تعديله)</label>
+    <input type="email" id="email" disabled>
+
+    <label>رقم الهاتف</label>
+    <input type="tel" id="phone">
+
+    <label>السن</label>
+    <input type="number" id="age">
+
+    <label>الخدمة</label>
+    <select id="service">
+      <option>مونتاج</option>
+      <option>إنشاء صور مصغرة</option>
+      <option>كتابة سكريبت</option>
+      <option>تحليل قناة</option>
+      <option>تعليق صوتي</option>
+      <option>تصميم غلاف/لوجو</option>
+      <option>أخرى</option>
+    </select>
+
+    <button id="saveBtn">💾 حفظ البيانات</button>
+  </div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4YGIHObEz7gkr6z7At09n9p6cJMj9l2A",
+      authDomain: "hsa4-ac45e.firebaseapp.com",
+      projectId: "hsa4-ac45e",
+      storageBucket: "hsa4-ac45e.firebasestorage.app",
+      messagingSenderId: "688236241105",
+      appId: "1:688236241105:web:4b5ff00e3f25b931b9a5f0",
+      measurementId: "G-5P717K607F"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // عرض البيانات
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("name").value = user.displayName || "";
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("profileImage").src = user.photoURL || "default-user.png";
+
+        document.getElementById("phone").value = localStorage.getItem("userPhone") || "";
+        document.getElementById("age").value = localStorage.getItem("userAge") || "";
+        document.getElementById("service").value = localStorage.getItem("userService") || "مونتاج";
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // زر الحفظ
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const newName = document.getElementById("name").value;
+      const newPhone = document.getElementById("phone").value;
+      const newAge = document.getElementById("age").value;
+      const newService = document.getElementById("service").value;
+      const newPhotoFile = document.getElementById("newImage").files[0];
+
+      localStorage.setItem("userPhone", newPhone);
+      localStorage.setItem("userAge", newAge);
+      localStorage.setItem("userService", newService);
+
+      let updateData = {
+        displayName: newName
+      };
+
+      if (newPhotoFile) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          updateData.photoURL = reader.result;
+
+          user.updateProfile(updateData).then(() => {
+            document.getElementById("profileImage").src = reader.result;
+            alert("✅ تم تحديث البيانات بنجاح");
+          }).catch(err => {
+            alert("❌ خطأ: " + err.message);
+          });
+        };
+        reader.readAsDataURL(newPhotoFile);
+      } else {
+        user.updateProfile(updateData).then(() => {
+          alert("✅ تم تحديث البيانات بنجاح");
+        }).catch(err => {
+          alert("❌ خطأ: " + err.message);
+        });
+      }
+    });
+
+    // تسجيل الخروج
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+  </script>
+
+</body>
+</html>
