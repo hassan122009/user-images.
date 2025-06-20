@@ -10,6 +10,31 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
+    .home-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px; /* لو انت عامل RTL خليه يسار */
+  font-size: 26px;
+  background-color: #fff;
+  color: #d00;
+  border: 2px solid #d00;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  text-align: center;
+  line-height: 40px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: 0.3s;
+  z-index: 9999;
+}
+
+.home-btn:hover {
+  background-color: #d00;
+  color: white;
+}
+
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
     body {
       background-color: #fff;
@@ -67,23 +92,9 @@
   </style>
 </head>
 <body>
-<div style="margin-top: 20px; text-align: center;">
-  <a href="index.html" style="text-decoration: none;">
-    <button style="
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: 2px solid #d00;
-      background-color: white;
-      color: #d00;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s;
-    " onmouseover="this.style.backgroundColor='#d00'; this.style.color='white';"
-       onmouseout="this.style.backgroundColor='white'; this.style.color='#d00';">
-      🔙 العودة إلى الصفحة الرئيسية
-    </button>
-  </a>
-</div>
+<a href="home.html" class="home-btn" title="الصفحة الرئيسية">
+  🏠
+</a>
 
   <div class="container">
     <h2>إنشاء حساب في محتواك</h2>
